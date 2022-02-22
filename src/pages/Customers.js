@@ -1,15 +1,18 @@
 import { getDatabase, ref, remove, onValue } from "firebase/database";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useFirebaseUser } from "../firebase-hooks";
 
 const Customers = () => {
 
   const [customers, setCustomers] = useState([]);
 
+  const { user } = useFirebaseUser();
+
   const database = getDatabase();
 
   useEffect(() => {
-    const customersRef = ref(database);
+    const customersRef = ref(database, user.uid + "/customers");
 
     // Nettoyer l'asynchrone du composant susceptivble d'être démonté
     // (le onValue se nettoie dès qu'on l'appelle (prévu par Firebase))
@@ -53,7 +56,7 @@ const Customers = () => {
 
     const database = getDatabase();
 
-    const customerRef = ref(database, id);
+    const customerRef = ref(database, user.uid + "/customers/" + id);
 
     remove(customerRef);
     /* setCustomers(customers.filter((c) => c.id !== id)); */

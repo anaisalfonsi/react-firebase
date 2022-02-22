@@ -6,6 +6,7 @@ import {
   get,
   set
 } from "firebase/database";
+import { useFirebaseUser } from "../firebase-hooks";
 
 const CustomerEdit = () => {
   const [data, setData] = useState(
@@ -16,6 +17,8 @@ const CustomerEdit = () => {
     },
   );
 
+  const { user } = useFirebaseUser();
+
   const navigate = useNavigate();
 
   const params = useParams();
@@ -23,7 +26,7 @@ const CustomerEdit = () => {
   useEffect(() => {
     const database = getDatabase();
 
-    const customerRef = ref(database, params.id);
+    const customerRef = ref(database, user.uid + "/customers/" + params.id);
 
     get(customerRef).then((snapshot) => {
         setData(snapshot.val());
@@ -39,7 +42,7 @@ const CustomerEdit = () => {
 
     const database = getDatabase();
 
-    const customerRef = ref(database, params.id);
+    const customerRef = ref(database, user.uid + "/customers/" + params.id);
 
     set(customerRef, data);
     navigate("/customers");

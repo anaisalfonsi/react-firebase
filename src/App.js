@@ -10,6 +10,7 @@ import { getDatabase, ref, get, onValue, push, set } from "firebase/database";
 import { getAuth, signOut } from 'firebase/auth';
 
 import { useFirebaseUser } from './firebase-hooks';
+import RegisterDetails from './pages/RegisterDetails';
 
 
 const Hello = () => {
@@ -79,12 +80,26 @@ function App() {
     setCustomers([...customers, customer]);
   } */
 
-  const { user, isLoading } = useFirebaseUser();
+  const { user, isLoading, userDetails } = useFirebaseUser();
+
+
+  const protectRoute = (element) => {
+    if (!user) {
+      return <Navigate to="/login" />;
+    }
+
+    if (!userDetails) {
+      return <Navigate to="/register/details" />;
+    }
+
+    return element;
+  }
 
   const handleLogout = () => {
     const auth = getAuth();
     signOut(auth);
   }
+
 
   return (
     <div className="container">
@@ -106,8 +121,14 @@ function App() {
             )}
             {user && (
               <>
+                {userDetails && (
+                  <li>
+                    <img src={userDetails.avatar} alt="" />{" "}
+                    <strong>Hello, {userDetails.firstName}.</strong>
+                  </li>
+                )}
                 <li>
-                  {user.email}
+                  <Link to="/register/details">Details</Link>
                 </li>
                 <li>
                   <Link to="/hello">Hello</Link>
@@ -129,17 +150,22 @@ function App() {
           <h2>En chargement...</h2>
         ) : (
           <Routes>
+            <Route path="/register/details" element={<RegisterDetails />} />
             <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/register" element={<Register />}></Route>
             <Route path="/login" element={<Login />}></Route>
             <Route
               path="/customers"
-              element={
-                user !== null ? <Customers /> : <Navigate to="/login" />
-              }
+              element={protectRoute(<Customers />)}
             ></Route>
-            <Route path="/customers/create" element={<CustomerForm />}></Route>
-            <Route path="/customers/:id" element={<CustomerEdit />}></Route>
+            <Route
+              path="/customers/create"
+              element={protectRoute(<CustomerForm />)}
+            ></Route>
+            <Route
+              path="/customers/:id"
+              element={protectRoute(<CustomerEdit />)}
+            ></Route>
 
             <Route path="/hello" element={<Hello />}></Route>
             <Route path="/hello/:prenom" element={<Hello />}></Route>

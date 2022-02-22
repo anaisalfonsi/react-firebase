@@ -14,7 +14,7 @@ const Register = () => {
     const auth = getAuth();
 
     createUserWithEmailAndPassword(auth, email, password)
-    .then(() => navigate("/customers"));
+    .then(() => navigate("/register/details"));
   }
 
   return (

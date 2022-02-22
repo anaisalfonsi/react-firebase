@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { getDatabase, ref, get, set, push } from "firebase/database";
+import { useFirebaseUser } from "../firebase-hooks";
 
 const CustomerForm = () => {
   const [data, setData] = useState(
@@ -10,6 +11,8 @@ const CustomerForm = () => {
       email: "",
     }
     );
+
+  const { user } = useFirebaseUser();
 
   const navigate = useNavigate();
 
@@ -22,7 +25,7 @@ const CustomerForm = () => {
 
     const database = getDatabase();
 
-    const dbRef = ref(database);
+    const dbRef = ref(database, user.uid + "/customers");
 
     const customerRef = push(dbRef);
     set(customerRef, data);
